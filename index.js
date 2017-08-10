@@ -25,11 +25,8 @@ function download (repo, dest, opts, fn) {
   opts = opts || {}
   var clone = opts.clone || false
 
-  repo = normalize(repo)
-  var url = getUrl(repo, clone)
-
   if (clone) {
-    gitclone(url, dest, { checkout: repo.checkout, shallow: repo.checkout === 'master' }, function (err) {
+    gitclone(repo, dest, { checkout: repo.checkout, shallow: repo.checkout === 'master' }, function (err) {
       if (err === undefined) {
         rm(dest + '/.git')
         fn()
@@ -38,6 +35,8 @@ function download (repo, dest, opts, fn) {
       }
     })
   } else {
+    repo = normalize(repo)
+    var url = getUrl(repo, clone)
     downloadUrl(url, dest, { extract: true, strip: 1, mode: '666', headers: { accept: 'application/zip' } }).then(data => {
       fn()
     }).catch(err => {
